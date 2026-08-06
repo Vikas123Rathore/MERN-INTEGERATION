@@ -1,64 +1,83 @@
-import { createContext, useContext, useState } from "react";
-import axios from "axios";
+import { createContext, useContext, useEffect, useState } from 'react'
+import axios from 'axios'
 
-const PostContext = createContext();
+export const PostContext = createContext()
+
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
+})
 
 export const PostProvider = ({ children }) => {
-  const [posts, setPosts] = useState([]);
-  const API = "http://localhost:5000/api/post";
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  // Get All Posts
-  const getPosts = async () => {
+  // GET ALL POSTS
+  const getAllPosts = async () => {
     try {
-      const res = await axios.get(API);
-      setPosts(res.data.posts);
-      console.log("result",res.data)
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      setLoading(true)
 
-  // Create Post
+      const { data } = await API.get('/post')
+      console.log('post', data.posts)
+      setPosts(data.posts)
+    } catch (error) {
+      console.log(error)
+    }
+
+    setLoading(false)
+  }
+
+  // CREATE POST
   const createPost = async (formData) => {
     try {
-      const res = await axios.post(API, formData, {
-        withCredentials: true,
+      setLoading(true)
+
+      const { data } = await API.post('/post', formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
-      });
+      })
 
-      setPosts((prev) => [res.data.post, ...prev]);
+      setPosts((prev) => [data.post, ...prev])
+
+      return data
     } catch (error) {
-      console.log(error);
+      console.log(error)
+      throw error
     }
-  };
 
-  // Delete Post
+    setLoading(false)
+  }
+
+  // DELETE POST
   const deletePost = async (id) => {
     try {
-      await axios.delete(`${API}/${id}`, {
-        withCredentials: true,
-      });
+      await API.delete(`/post/${id}`)
 
-      setPosts((prev) => prev.filter((post) => post._id !== id));
+      setPosts((prev) => prev.filter((post) => post._id !== id))
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
+
+  // Context load hote hi posts fetch honge
+  useEffect(() => {
+    getAllPosts()
+  }, [])
 
   return (
     <PostContext.Provider
       value={{
         posts,
-        getPosts,
+        loading,
         createPost,
         deletePost,
+        getAllPosts,
       }}
     >
       {children}
     </PostContext.Provider>
-  );
-};
+  )
+}
 
-export const usePost = () => useContext(PostContext);
+export const usePost = () => useContext(PostContext)

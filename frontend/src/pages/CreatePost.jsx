@@ -1,6 +1,48 @@
+import { useState, useContext } from "react";
 import { ImagePlus, Send } from "lucide-react";
+import { PostContext } from "../context/PostContext";
 
 export default function CreatePost() {
+  const { createPost, loading, error } = useContext(PostContext);
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [image, setImage] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("content", content);
+
+    if (image) {
+      formData.append("image", image);
+    }
+
+    try {
+      await createPost(formData);
+
+      alert("Post created successfully!");
+
+      setTitle("");
+      setContent("");
+      setImage(null);
+
+      // Reset file input
+      e.target.reset();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleReset = () => {
+    setTitle("");
+    setContent("");
+    setImage(null);
+  };
+
   return (
     <section className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-10">
@@ -16,7 +58,14 @@ export default function CreatePost() {
           </p>
         </div>
 
-        <form className="space-y-7">
+        {/* Error */}
+        {error && (
+          <div className="mb-6 rounded-xl bg-red-500/20 border border-red-500 p-4 text-red-300">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} onReset={handleReset} className="space-y-7">
 
           {/* Title */}
           <div>
@@ -27,34 +76,40 @@ export default function CreatePost() {
             <input
               type="text"
               placeholder="Enter your post title..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
               className="w-full bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 outline-none focus:border-blue-500 transition"
             />
           </div>
 
-          {/* Description */}
+          {/* Content */}
           <div>
             <label className="block mb-2 text-slate-300 font-medium">
-              Description
+              Content
             </label>
 
             <textarea
               rows="6"
               placeholder="Write something amazing..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
               className="w-full bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 outline-none resize-none focus:border-blue-500 transition"
             />
           </div>
 
-          {/* Image Upload */}
+          {/* Upload */}
           <div>
             <label className="block mb-2 text-slate-300 font-medium">
-              Upload Image
+              Upload Image (Optional)
             </label>
 
-            <label className="flex items-center justify-center gap-3 w-full border-2 border-dashed border-slate-700 rounded-2xl p-8 cursor-pointer hover:border-blue-500 transition">
+            <label className="flex flex-col items-center justify-center gap-3 w-full border-2 border-dashed border-slate-700 rounded-2xl p-8 cursor-pointer hover:border-blue-500 transition">
 
-              <ImagePlus size={32} className="text-blue-400" />
+              <ImagePlus size={36} className="text-blue-400" />
 
-              <div>
+              <div className="text-center">
                 <p className="font-semibold">
                   Click to upload an image
                 </p>
@@ -64,9 +119,17 @@ export default function CreatePost() {
                 </p>
               </div>
 
+              {image && (
+                <p className="text-green-400 text-sm">
+                  Selected: {image.name}
+                </p>
+              )}
+
               <input
                 type="file"
+                accept="image/*"
                 className="hidden"
+                onChange={(e) => setImage(e.target.files[0])}
               />
             </label>
           </div>
@@ -76,23 +139,33 @@ export default function CreatePost() {
 
             <button
               type="reset"
-              className="px-6 py-3 rounded-xl border border-slate-700 hover:border-red-500 transition"
+              disabled={loading}
+              className="px-6 py-3 rounded-xl border border-slate-700 hover:border-red-500 transition disabled:opacity-50"
             >
               Reset
             </button>
 
             <button
               type="submit"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-7 py-3 rounded-xl font-semibold transition"
+              disabled={loading}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-7 py-3 rounded-xl font-semibold transition"
             >
-              <Send size={18} />
-              Publish Post
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Publishing...
+                </>
+              ) : (
+                <>
+                  <Send size={18} />
+                  Publish Post
+                </>
+              )}
             </button>
 
           </div>
 
         </form>
-
       </div>
     </section>
   );

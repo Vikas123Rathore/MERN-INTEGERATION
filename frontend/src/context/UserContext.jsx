@@ -8,8 +8,7 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const serverUrl = 'http://localhost:8000/api'
-
+  const serverUrl = import.meta.env.VITE_SERVER_URL;
   // Current User
   const getCurrentUser = async () => {
     try {

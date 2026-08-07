@@ -10,9 +10,9 @@ PostHub is a full-stack MERN application where users can register, log in, creat
 
 | Resource | Link |
 |----------|------|
-| GitHub Repository | https://github.com/your-username/your-repository |
-| Frontend Demo | https://your-frontend-demo.vercel.app |
-| Backend API | https://your-backend-api.onrender.com |
+| GitHub Repository | https://github.com/Vikas123Rathore/MERN-INTEGERATION/tree/main |
+| Backend API | https://mern-integeration.onrender.com/ |
+| project link | https://mern-integeration-frontend.onrender.com/ |
 
 ---
 

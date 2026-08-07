@@ -24,7 +24,20 @@ connectDb();
 // Middlewares
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "https://mern-integeration-frontend.onrender.com"
+      ];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+
+    },
     credentials: true,
   })
 );

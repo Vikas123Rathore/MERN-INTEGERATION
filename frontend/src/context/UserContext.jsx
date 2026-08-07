@@ -9,14 +9,31 @@ export const UserProvider = ({ children }) => {
   const [error, setError] = useState('')
 
   const rawServerUrl = import.meta.env.VITE_SERVER_URL?.trim()
+  const isDev = import.meta.env.DEV
   const serverUrl = rawServerUrl
     ? rawServerUrl.endsWith('/api')
       ? rawServerUrl
       : `${rawServerUrl}/api`
-    : 'http://localhost:8000/api'
+    : isDev
+      ? 'http://localhost:8000/api'
+      : ''
+
+  useEffect(() => {
+    if (!serverUrl && !isDev) {
+      const message =
+        'Deployment misconfiguration: VITE_SERVER_URL is missing in frontend environment variables.'
+
+      console.error(message)
+      setError(message)
+    }
+  }, [isDev, serverUrl])
 
   // Current User
   const getCurrentUser = async () => {
+    if (!serverUrl) {
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -36,6 +53,11 @@ export const UserProvider = ({ children }) => {
 
   // Register
   const register = async (userData) => {
+    if (!serverUrl) {
+      setError('Server URL is missing. Please contact admin.')
+      return null
+    }
+
     try {
       setLoading(true)
 
@@ -60,6 +82,11 @@ export const UserProvider = ({ children }) => {
 
   // Login
   const login = async (userData) => {
+    if (!serverUrl) {
+      setError('Server URL is missing. Please contact admin.')
+      return null
+    }
+
     try {
       setLoading(true)
 
@@ -84,6 +111,10 @@ export const UserProvider = ({ children }) => {
 
   // Logout
   const logout = async () => {
+    if (!serverUrl) {
+      return
+    }
+
     try {
       setLoading(true)
 

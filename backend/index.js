@@ -18,12 +18,14 @@ const PORT = process.env.PORT || 5000;
 connectDb();
 
 // Middlewares
-app.use(
-  cors({
-    origin: "http://localhost:5173", // React/Vite frontend
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+
+    "https://mern-integeration-frontend.onrender.com"
+  ],
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(cookieParser());

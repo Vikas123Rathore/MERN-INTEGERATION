@@ -1,30 +1,40 @@
-import { PenSquare, BookOpen, Trash2, ShieldCheck } from "lucide-react";
+import {
+  PenSquare,
+  BookOpen,
+  Trash2,
+  ShieldCheck,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Features() {
+  const navigate = useNavigate();
+
   const features = [
     {
-      icon: <PenSquare size={34} />,
+      icon: <PenSquare size={28} />,
       title: "Create Posts",
       description:
         "Write and publish posts quickly with an intuitive interface.",
       color: "from-blue-500 to-cyan-500",
+      onClick: () => navigate("/create"),
     },
     {
-      icon: <BookOpen size={34} />,
+      icon: <BookOpen size={28} />,
       title: "View My Posts",
       description:
-        "Browse all posts with a clean and responsive layout.",
+        "Browse and manage all your posts in one place.",
       color: "from-purple-500 to-pink-500",
+      onClick: () => navigate("/myposts"),
     },
     {
-      icon: <Trash2 size={34} />,
+      icon: <Trash2 size={28} />,
       title: "Delete Posts",
       description:
         "Remove unwanted posts instantly with secure API actions.",
       color: "from-red-500 to-orange-500",
     },
     {
-      icon: <ShieldCheck size={34} />,
+      icon: <ShieldCheck size={28} />,
       title: "Secure Backend",
       description:
         "Powered by Express, MongoDB and REST APIs for reliability.",
@@ -35,9 +45,10 @@ export default function Features() {
   return (
     <section className="bg-slate-950 text-white py-24">
       <div className="max-w-7xl mx-auto px-6">
+
         {/* Heading */}
         <div className="text-center mb-16">
-          <span className="text-blue-400 font-semibold uppercase tracking-widest">
+          <span className="text-blue-400 uppercase tracking-widest font-semibold">
             Features
           </span>
 
@@ -56,7 +67,10 @@ export default function Features() {
           {features.map((item, index) => (
             <div
               key={index}
-              className="group rounded-3xl border border-slate-800 bg-slate-900 p-8 hover:border-blue-500 hover:-translate-y-2 transition-all duration-300"
+              onClick={item.onClick}
+              className={`group rounded-3xl border border-slate-800 bg-slate-900 p-8 hover:border-blue-500 hover:-translate-y-2 transition-all duration-300 ${
+                item.onClick ? "cursor-pointer" : ""
+              }`}
             >
               <div
                 className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${item.color}`}

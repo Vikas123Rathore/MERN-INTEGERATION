@@ -1,92 +1,98 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { createContext, useContext, useEffect, useState } from 'react'
+import axios from 'axios'
 
-const UserContext = createContext();
-
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
-});
+const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const serverUrl = 'http://localhost:8000/api'
 
   // Current User
   const getCurrentUser = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const { data } = await API.get("/user/current-user");
+      const res = await axios.get(serverUrl + '/user/current-user', {
+        withCredentials: true,
+      })
 
-      setUser(data.user);
-      setError("");
+      setUser(res.data.user)
+      setError('')
     } catch (err) {
-      setUser(null);
-      setError(err.response?.data?.message || "");
-    } finally {
-      setLoading(false);
+      setUser(null)
+      setError(err.response?.data?.message || '')
     }
-  };
+
+    setLoading(false)
+  }
 
   // Register
   const register = async (userData) => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const { data } = await API.post("/user/register", userData);
+      const res = await axios.post(serverUrl + '/user/register', userData, {
+        withCredentials: true,
+      })
 
-      setUser(data.user);
-      setError("");
+      setUser(res.data.user)
 
-      return data;
+      return res.data
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-      throw err;
-    } finally {
-      setLoading(false);
+      console.log(err)
+      throw err
     }
-  };
+
+    setLoading(false)
+  }
 
   // Login
   const login = async (userData) => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const { data } = await API.post("/user/login", userData);
+      const res = await axios.post(serverUrl + '/user/login', userData, {
+        withCredentials: true,
+      })
 
-      setUser(data.user);
-      setError("");
+      setUser(res.data.user)
 
-      return data;
+      return res.data
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-      throw err;
-    } finally {
-      setLoading(false);
+      console.log(err)
+      throw err
     }
-  };
+
+    setLoading(false)
+  }
 
   // Logout
   const logout = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      await API.post("/user/logout");
+      await axios.post(
+        serverUrl + '/user/logout',
+        {},
+        {
+          withCredentials: true,
+        },
+      )
 
-      setUser(null);
-      setError("");
+      setUser(null)
     } catch (err) {
-      setError(err.response?.data?.message || "Logout failed");
-    } finally {
-      setLoading(false);
+      console.log(err)
     }
-  };
+
+    setLoading(false)
+  }
 
   useEffect(() => {
-    getCurrentUser();
-  }, []);
+    getCurrentUser()
+  }, [])
 
   return (
     <UserContext.Provider
@@ -94,6 +100,7 @@ export const UserProvider = ({ children }) => {
         user,
         loading,
         error,
+        serverUrl,
         register,
         login,
         logout,
@@ -102,7 +109,7 @@ export const UserProvider = ({ children }) => {
     >
       {children}
     </UserContext.Provider>
-  );
-};
+  )
+}
 
-export const useUser = () => useContext(UserContext);
+export const useUser = () => useContext(UserContext)

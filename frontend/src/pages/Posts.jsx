@@ -85,7 +85,7 @@ export default function Posts() {
                         <>
                           <button
                             className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-xl transition cursor-pointer"
-                            onClick={() => navigate('/edit')}
+                            onClick={() => navigate(`/edit/${post._id}`)}
                           >
                             Edit
                           </button>

@@ -1,25 +1,25 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
+import { useUser } from './UserContext'
 
 export const PostContext = createContext()
-
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
-})
 
 export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(false)
+
+  const { serverUrl } = useUser()
 
   // GET ALL POSTS
   const getAllPosts = async () => {
     try {
       setLoading(true)
 
-      const { data } = await API.get('/post')
-      console.log('post', data.posts)
-      setPosts(data.posts)
+      const res = await axios.get(serverUrl + '/post', {
+        withCredentials: true,
+      })
+
+      setPosts(res.data.posts)
     } catch (error) {
       console.log(error)
     }
@@ -32,15 +32,13 @@ export const PostProvider = ({ children }) => {
     try {
       setLoading(true)
 
-      const { data } = await API.post('/post', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const res = await axios.post(serverUrl + '/post', formData, {
+        withCredentials: true,
       })
 
-      setPosts((prev) => [data.post, ...prev])
+      setPosts((prev) => [res.data.post, ...prev])
 
-      return data
+      return res.data
     } catch (error) {
       console.log(error)
       throw error
@@ -49,18 +47,35 @@ export const PostProvider = ({ children }) => {
     setLoading(false)
   }
 
+  // UPDATE POST
+  const updatePost = async (id, formData) => {
+    try {
+      setLoading(true)
+
+      const res = await axios.put(serverUrl + '/post/' + id, formData, {
+        withCredentials: true,
+      })
+      await getAllPosts()
+    } catch (error) {
+      console.log(error)
+    }
+
+    setLoading(false)
+  }
+
   // DELETE POST
   const deletePost = async (id) => {
     try {
-      await API.delete(`/post/${id}`)
+      await axios.delete(serverUrl + '/post/' + id, {
+        withCredentials: true,
+      })
 
-      setPosts((prev) => prev.filter((post) => post._id !== id))
+      setPosts(posts.filter((post) => post._id !== id))
     } catch (error) {
       console.log(error)
     }
   }
 
-  // Context load hote hi posts fetch honge
   useEffect(() => {
     getAllPosts()
   }, [])
@@ -70,9 +85,10 @@ export const PostProvider = ({ children }) => {
       value={{
         posts,
         loading,
-        createPost,
-        deletePost,
         getAllPosts,
+        createPost,
+        updatePost,
+        deletePost,
       }}
     >
       {children}

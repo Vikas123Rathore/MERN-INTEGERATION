@@ -1,51 +1,62 @@
-import { useState, useContext } from "react";
-import { ImagePlus, Send } from "lucide-react";
-import { PostContext } from "../context/PostContext";
+import { useState, useContext } from 'react'
+import { ImagePlus, Send, ArrowLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { PostContext } from '../context/PostContext'
 
 export default function CreatePost() {
-  const { createPost, loading, error } = useContext(PostContext);
+  const { createPost, loading, error } = useContext(PostContext)
+  const navigate = useNavigate()
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [image, setImage] = useState(null);
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [image, setImage] = useState(null)
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    const formData = new FormData();
+    const formData = new FormData()
 
-    formData.append("title", title);
-    formData.append("content", content);
+    formData.append('title', title)
+    formData.append('content', content)
 
     if (image) {
-      formData.append("image", image);
+      formData.append('image', image)
     }
 
     try {
-      await createPost(formData);
+      await createPost(formData)
 
-      alert("Post created successfully!");
+      alert('Post created successfully!')
 
-      setTitle("");
-      setContent("");
-      setImage(null);
+      setTitle('')
+      setContent('')
+      setImage(null)
 
-      // Reset file input
-      e.target.reset();
+      e.target.reset()
+
+      navigate('/posts')
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const handleReset = () => {
-    setTitle("");
-    setContent("");
-    setImage(null);
-  };
+    setTitle('')
+    setContent('')
+    setImage(null)
+  }
 
   return (
     <section className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-10">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-slate-400 hover:text-blue-400 transition mb-8 cursor-pointer"
+        >
+          <ArrowLeft size={20} />
+          Back to Home
+        </button>
 
         {/* Heading */}
         <div className="text-center mb-10">
@@ -54,7 +65,7 @@ export default function CreatePost() {
           </h1>
 
           <p className="text-slate-400 mt-3">
-            Share your thoughts by creating a new post.
+            Share your thoughts and publish something amazing.
           </p>
         </div>
 
@@ -65,8 +76,11 @@ export default function CreatePost() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} onReset={handleReset} className="space-y-7">
-
+        <form
+          onSubmit={handleSubmit}
+          onReset={handleReset}
+          className="space-y-7"
+        >
           {/* Title */}
           <div>
             <label className="block mb-2 text-slate-300 font-medium">
@@ -99,30 +113,23 @@ export default function CreatePost() {
             />
           </div>
 
-          {/* Upload */}
+          {/* Image Upload */}
           <div>
             <label className="block mb-2 text-slate-300 font-medium">
               Upload Image (Optional)
             </label>
 
             <label className="flex flex-col items-center justify-center gap-3 w-full border-2 border-dashed border-slate-700 rounded-2xl p-8 cursor-pointer hover:border-blue-500 transition">
-
               <ImagePlus size={36} className="text-blue-400" />
 
               <div className="text-center">
-                <p className="font-semibold">
-                  Click to upload an image
-                </p>
+                <p className="font-semibold">Click to upload an image</p>
 
-                <p className="text-sm text-slate-400">
-                  PNG, JPG or JPEG
-                </p>
+                <p className="text-sm text-slate-400">PNG, JPG or JPEG</p>
               </div>
 
               {image && (
-                <p className="text-green-400 text-sm">
-                  Selected: {image.name}
-                </p>
+                <p className="text-green-400 text-sm">Selected: {image.name}</p>
               )}
 
               <input
@@ -136,7 +143,6 @@ export default function CreatePost() {
 
           {/* Buttons */}
           <div className="flex justify-end gap-4 pt-4">
-
             <button
               type="reset"
               disabled={loading}
@@ -162,11 +168,9 @@ export default function CreatePost() {
                 </>
               )}
             </button>
-
           </div>
-
         </form>
       </div>
     </section>
-  );
+  )
 }

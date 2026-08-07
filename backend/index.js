@@ -13,19 +13,21 @@ import postRoutes from "./routes/postRoute.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 // Database Connection
 connectDb();
 
 // Middlewares
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-
-    "https://mern-integeration-frontend.onrender.com"
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());

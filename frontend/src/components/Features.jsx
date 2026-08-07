@@ -73,7 +73,7 @@ export default function Features() {
               }`}
             >
               <div
-                className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${item.color}`}
+                className={`inline-flex p-4 rounded-2xl bg-linear-to-r ${item.color}`}
               >
                 {item.icon}
               </div>

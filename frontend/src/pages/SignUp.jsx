@@ -1,35 +1,39 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext"; // path apne project ke hisab se change kar lena
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useUser } from '../context/UserContext' // path apne project ke hisab se change kar lena
+import { toast } from 'react-toastify'
 
 export default function SignUp() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { register, loading, error } = useUser();
+  const { register, loading, error } = useUser()
 
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+    name: '',
+    email: '',
+    password: '',
+  })
 
   const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
-    });
-  };
+    })
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    try {
-      await register(form);
-      navigate("/");
-    } catch (err) {
-      // Error UserContext se handle hoga
+    const result = await register(form)
+
+    if (!result) {
+      toast.error('Registration failed. Please check the form details.')
+      return
     }
-  };
+
+    toast.success('Account created successfully')
+    navigate('/')
+  }
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-slate-950 px-4">
@@ -95,7 +99,7 @@ export default function SignUp() {
               Creating Account...
             </>
           ) : (
-            "Create Account"
+            'Create Account'
           )}
         </button>
 
@@ -106,7 +110,7 @@ export default function SignUp() {
         </div>
 
         <p className="text-center text-slate-400">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <Link
             to="/login"
             className="text-blue-400 hover:text-blue-300 font-semibold"
@@ -116,5 +120,5 @@ export default function SignUp() {
         </p>
       </form>
     </div>
-  );
+  )
 }

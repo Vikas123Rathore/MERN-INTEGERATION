@@ -1,15 +1,34 @@
-import { useState, useContext } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { ImagePlus, Send, ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { PostContext } from '../context/PostContext'
+import { useUser } from '../context/UserContext'
+import { toast } from 'react-toastify'
 
 export default function CreatePost() {
   const { createPost, loading, error } = useContext(PostContext)
+  const { user, loading: authLoading } = useUser()
   const navigate = useNavigate()
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [image, setImage] = useState(null)
+
+  // Redirect logged-out users before they reach the form.
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast.error('Please login first to create a post.')
+      navigate('/login', { replace: true })
+    }
+  }, [authLoading, navigate, user])
+
+  if (authLoading || !user) {
+    return (
+      <section className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-16">
+        <div className="text-slate-400">Checking login status...</div>
+      </section>
+    )
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -25,15 +44,10 @@ export default function CreatePost() {
 
     try {
       await createPost(formData)
-
-      alert('Post created successfully!')
-
       setTitle('')
       setContent('')
       setImage(null)
-
       e.target.reset()
-
       navigate('/posts')
     } catch (err) {
       console.log(err)
@@ -146,7 +160,7 @@ export default function CreatePost() {
             <button
               type="reset"
               disabled={loading}
-              className="px-6 py-3 rounded-xl border border-slate-700 hover:border-red-500 transition disabled:opacity-50"
+              className="px-6 py-3 rounded-xl border border-slate-700 hover:border-red-500 transition disabled:opacity-50 cursor-pointer"
             >
               Reset
             </button>
@@ -154,7 +168,7 @@ export default function CreatePost() {
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-7 py-3 rounded-xl font-semibold transition"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-7 py-3 rounded-xl font-semibold transition cursor-pointer"
             >
               {loading ? (
                 <>

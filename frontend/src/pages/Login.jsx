@@ -1,36 +1,38 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext"; // path apne project ke hisab se change kar lena
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useUser } from '../context/UserContext' // path apne project ke hisab se change kar lena
+import { toast } from 'react-toastify'
 
 export default function Login() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { login, loading, error } = useUser();
+  const { login, loading, error } = useUser()
 
   const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+    email: '',
+    password: '',
+  })
 
   const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
-    });
-  };
+    })
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    try {
-      await login(form);
+    const result = await login(form)
 
-      alert("Login Successful");
-      navigate("/");
-    } catch (err) {
-      // Error UserContext me handle ho raha hai
+    if (!result) {
+      toast.error('Login failed. Please check your credentials.')
+      return
     }
-  };
+
+    toast.success('Login successful')
+    navigate('/')
+  }
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-slate-950 px-4">
@@ -89,7 +91,7 @@ export default function Login() {
               Logging in...
             </>
           ) : (
-            "Login"
+            'Login'
           )}
         </button>
 
@@ -100,7 +102,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-slate-400">
-          Don't have an account?{" "}
+          Don't have an account?{' '}
           <Link
             to="/register"
             className="text-blue-400 hover:text-blue-300 font-semibold"
@@ -110,5 +112,5 @@ export default function Login() {
         </p>
       </form>
     </div>
-  );
+  )
 }

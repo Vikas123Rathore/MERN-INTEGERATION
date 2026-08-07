@@ -6,7 +6,7 @@ export default function Banner() {
   const navigate = useNavigate()
 
   return (
-    <section className="min-h-[90vh] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white flex items-center">
+    <section className="min-h-[90vh] bg-linear-to-br from-slate-950 via-slate-900 to-blue-950 text-white flex items-center">
       <div className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-14 items-center">
         {/* Left Section */}
 

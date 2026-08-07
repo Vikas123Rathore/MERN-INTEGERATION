@@ -24,9 +24,9 @@ export const UserProvider = ({ children }) => {
     } catch (err) {
       setUser(null)
       setError(err.response?.data?.message || '')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   // Register
@@ -39,14 +39,18 @@ export const UserProvider = ({ children }) => {
       })
 
       setUser(res.data.user)
+      setError('')
 
       return res.data
     } catch (err) {
       console.log(err)
-      throw err
-    }
 
-    setLoading(false)
+      setError(err.response?.data?.message || 'Registration failed')
+
+      return null
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Login
@@ -59,14 +63,18 @@ export const UserProvider = ({ children }) => {
       })
 
       setUser(res.data.user)
+      setError('')
 
       return res.data
     } catch (err) {
       console.log(err)
-      throw err
-    }
 
-    setLoading(false)
+      setError(err.response?.data?.message || 'Login failed')
+
+      return null
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Logout
@@ -83,11 +91,13 @@ export const UserProvider = ({ children }) => {
       )
 
       setUser(null)
+      setError('')
     } catch (err) {
       console.log(err)
+      setError(err.response?.data?.message || 'Logout failed')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   useEffect(() => {

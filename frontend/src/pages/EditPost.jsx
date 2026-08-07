@@ -1,22 +1,65 @@
 import { ImagePlus, Save, ArrowLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { usePost } from '../context/PostContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useUser } from '../context/UserContext'
+import { toast } from 'react-toastify'
 
 export default function EditPost() {
   const navigate = useNavigate()
   const { id } = useParams()
 
-  const { updatePost,loading } = usePost()
+  const { getPostById, updatePost, loading } = usePost()
+  const { user, loading: authLoading } = useUser()
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [image, setImage] = useState(null)
+  const [currentImage, setCurrentImage] = useState('')
+  const [postLoading, setPostLoading] = useState(true)
+
+  // Redirect logged-out users before edit mode loads.
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast.error('Please login first to edit a post.')
+      navigate('/login', { replace: true })
+    }
+  }, [authLoading, navigate, user])
+
+  // Prefill the edit form with the existing post data.
+  useEffect(() => {
+    const loadPost = async () => {
+      try {
+        setPostLoading(true)
+
+        const post = await getPostById(id)
+
+        setTitle(post.title || '')
+        setContent(post.content || '')
+        setCurrentImage(post.image || '')
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Post not found')
+        navigate('/posts', { replace: true })
+      } finally {
+        setPostLoading(false)
+      }
+    }
+
+    if (user) {
+      loadPost()
+    }
+  }, [getPostById, id, navigate, user])
+
+  if (authLoading || postLoading || !user) {
+    return (
+      <section className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-16">
+        <div className="text-slate-400">Loading post...</div>
+      </section>
+    )
+  }
 
   const handleUpdate = async (e) => {
     e.preventDefault()
-
-    console.log('Handle Update Called')
 
     const formData = new FormData()
 
@@ -27,12 +70,8 @@ export default function EditPost() {
       formData.append('image', image)
     }
 
-    console.log(id) // Check id aa rahi hai ya nahi
-
     try {
       await updatePost(id, formData)
-
-      console.log('Update Success')
 
       navigate('/posts')
     } catch (error) {
@@ -47,7 +86,7 @@ export default function EditPost() {
         <div className="mb-10">
           <button
             onClick={() => navigate('/posts')}
-            className="flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition"
+            className="flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition cursor-pointer"
           >
             <ArrowLeft size={20} />
             Back to Posts
@@ -124,6 +163,16 @@ export default function EditPost() {
                 onChange={(e) => setImage(e.target.files[0])}
               />
             </label>
+
+            {currentImage && !image && (
+              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-800">
+                <img
+                  src={currentImage}
+                  alt="Current post"
+                  className="h-56 w-full object-cover"
+                />
+              </div>
+            )}
           </div>
 
           {/* Buttons */}
@@ -132,7 +181,7 @@ export default function EditPost() {
             <button
               type="button"
               onClick={() => navigate('/posts')}
-              className="px-6 py-3 rounded-xl border border-slate-700 hover:border-red-500"
+              className="px-6 py-3 rounded-xl border border-slate-700 hover:border-red-500 cursor-pointer"
             >
               Cancel
             </button>
@@ -140,7 +189,7 @@ export default function EditPost() {
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-7 py-3 rounded-xl font-semibold transition"
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-7 py-3 rounded-xl font-semibold transition cursor-pointer"
             >
               {loading ? (
                 <>

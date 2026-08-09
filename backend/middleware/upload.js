@@ -1,11 +1,19 @@
 import multer from "multer";
+import fs from "fs";
+import path from "path";
+
+const uploadDir = path.resolve("public");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Configure file storage
 const storage = multer.diskStorage({
 
   // Store uploaded files in public folder
   destination: (req, file, cb) => {
-    cb(null, "public");
+    cb(null, uploadDir);
   },
 
   // Generate unique file name

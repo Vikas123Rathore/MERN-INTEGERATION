@@ -4,6 +4,7 @@ dotenv.config();
 
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 import { connectDb } from "./config/db.js";
 import userRoutes from "./routes/userRoute.js";
@@ -28,6 +29,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.use("/public", express.static(path.resolve("public")));
 
 // Logger Middleware
 app.use((req, res, next) => {

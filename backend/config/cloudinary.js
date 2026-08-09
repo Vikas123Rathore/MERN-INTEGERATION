@@ -3,6 +3,7 @@ dotenv.config();
 
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import path from "path";
 
 // Check if Cloudinary credentials are available
 const isCloudinaryConfigured = Boolean(
@@ -52,12 +53,9 @@ const uploadOnCloudinary = async (filepath) => {
             error?.message || error
         );
 
-        // Delete local file even if upload fails
-        if (fs.existsSync(filepath)) {
-            fs.unlinkSync(filepath);
-        }
+        const fallbackUrl = `/public/${path.basename(filepath)}`;
 
-        return null;
+        return fallbackUrl;
     }
 };
 

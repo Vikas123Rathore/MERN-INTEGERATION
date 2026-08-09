@@ -18,7 +18,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true);
 
       const response = await axios.get(
-        serverUrl + "/user/current-user",
+        serverUrl + "/api/user/current-user",
         {
           withCredentials: true,
         }
@@ -46,7 +46,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true);
 
       const response = await axios.post(
-        serverUrl + "/user/register",
+        serverUrl + "/api/user/register",
         userData,
         {
           withCredentials: true,
@@ -80,7 +80,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true);
 
       const response = await axios.post(
-        serverUrl + "/user/login",
+        serverUrl + "/api/user/login",
         userData,
         {
           withCredentials: true,
@@ -114,7 +114,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true);
 
       await axios.post(
-        serverUrl + "/user/logout",
+        serverUrl + "/api/user/logout",
         {},
         {
           withCredentials: true,

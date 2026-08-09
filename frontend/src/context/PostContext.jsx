@@ -16,7 +16,7 @@ export const PostProvider = ({ children }) => {
     try {
       setLoading(true)
 
-      const res = await axios.get(serverUrl + '/post', {
+      const res = await axios.get(serverUrl + '/api/post', {
         withCredentials: true,
       })
 
@@ -35,7 +35,7 @@ export const PostProvider = ({ children }) => {
     try {
       setLoading(true)
 
-      const res = await axios.post(serverUrl + '/post', formData, {
+      const res = await axios.post(serverUrl + '/api/post', formData, {
         withCredentials: true,
       })
 
@@ -60,7 +60,7 @@ export const PostProvider = ({ children }) => {
     try {
       setLoading(true)
 
-      await axios.put(serverUrl + '/post/' + id, formData, {
+      await axios.put(serverUrl + '/api/post/' + id, formData, {
         withCredentials: true,
       })
 
@@ -81,7 +81,7 @@ export const PostProvider = ({ children }) => {
   // DELETE POST
   const deletePost = async (id) => {
     try {
-      await axios.delete(serverUrl + '/post/' + id, {
+      await axios.delete(serverUrl + '/api/post/' + id, {
         withCredentials: true,
       })
 
@@ -98,7 +98,7 @@ export const PostProvider = ({ children }) => {
   // GET SINGLE POST
   const getPostById = async (id) => {
     try {
-      const res = await axios.get(serverUrl + '/post/' + id, {
+      const res = await axios.get(serverUrl + '/api/post/' + id, {
         withCredentials: true,
       })
 

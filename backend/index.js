@@ -13,10 +13,6 @@ import postRoutes from "./routes/postRoute.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
 
 
 // Database Connection
@@ -25,15 +21,8 @@ connectDb();
 // Middlewares
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
+    origin: "https://mern-integeration-frontend.onrender.com",
+    credentials: true
   })
 );
 

@@ -43,8 +43,8 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
-app.use("/api/user", userRoutes);
-app.use("/api/post", postRoutes);
+app.use("api/user", userRoutes);
+app.use("api/post", postRoutes);
 
 // Start Server
 app.listen(PORT, () => {

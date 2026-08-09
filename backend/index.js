@@ -21,7 +21,7 @@ connectDb();
 // Middlewares
 app.use(
   cors({
-    origin: "https://mern-integeration-frontend.onrender.com",
+    origin: "http://localhost:5173",
     credentials: true
   })
 );

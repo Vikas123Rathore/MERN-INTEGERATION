@@ -9,7 +9,7 @@ export const UserProvider = ({ children }) => {
   const [error, setError] = useState("");
 
   // Backend URL
-  const serverUrl = "https://mern-integeration.onrender.com"
+  const serverUrl = "http://localhost:8000";
 
   // ================= GET CURRENT USER =================
 

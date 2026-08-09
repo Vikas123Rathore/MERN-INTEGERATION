@@ -21,7 +21,7 @@ connectDb();
 // Middlewares
 app.use(
   cors({
-    origin: "https://mern-integeration-p-git-07ca3b-vikas-rathores-projects-33d1134a.vercel.app/",
+    origin: "http://localhost:5173",
     credentials: true
   })
 );

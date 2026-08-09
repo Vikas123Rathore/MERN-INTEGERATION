@@ -5,7 +5,7 @@ const storage = multer.diskStorage({
 
   // Store uploaded files in public folder
   destination: (req, file, cb) => {
-    cb(null, "public/");
+    cb(null, "public");
   },
 
   // Generate unique file name

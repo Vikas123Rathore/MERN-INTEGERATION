@@ -21,7 +21,7 @@ connectDb();
 // Middlewares
 app.use(
   cors({
-    origin: "https://mern-integeration-frontend.onrender.com",
+    origin: "https://mern-integeration-post-hub.vercel.app/",
     credentials: true
   })
 );

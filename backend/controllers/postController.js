@@ -54,7 +54,7 @@ export const postCreate = async (req, res) => {
     });
   }
 };
-// getting all post controller
+// getting all post
 export const getAllPsot = async (req, res) => {
   try {
     const posts = await Post.find()
@@ -74,7 +74,7 @@ export const getAllPsot = async (req, res) => {
   }
 };
 
-// getting post by id controller
+
 export const getPostbyId = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id).populate(

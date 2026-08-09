@@ -17,15 +17,15 @@ const router = express.Router();
 
 
 // CREATE POST
-router.post("/", protect, fileUpload, postCreate);
+router.post("/",protect,fileUpload,postCreate);
 
 
 // UPDATE POST
-router.put("/:id", protect, fileUpload, updatePost);
+router.put("/:id",protect,fileUpload,updatePost);
 
 
 // DELETE POST
-router.delete("/:id", protect, deletePost);
+router.delete("/:id",protect,deletePost);
 
 
 // GET ALL POSTS

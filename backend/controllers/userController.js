@@ -3,317 +3,224 @@ import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 
 
-// Cookie settings for Render production
-const cookieOptions = {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-};
-
-
-// Cookie clear settings
-const clearCookieOptions = {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-};
-
-
-const stripPassword = (userDoc) => {
-  const user = userDoc.toObject();
-  delete user.password;
-  return user;
-};
-
-
-
-// ================= REGISTER =================
+// ================= REGISTER USER =================
 
 export const createUser = async (req, res) => {
 
-  const { name, email, password } = req.body;
+    const { name, email, password } = req.body;
+
+    try {
+
+        // Check required fields
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                message: "Name, email and password are required"
+            });
+        }
 
 
-  try {
+        // Check if user already exists
+        const existingUser = await User.findOne({
+            email: email.toLowerCase().trim()
+        });
 
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        message: "Name, email and password are required"
-      });
+        if (existingUser) {
+            return res.status(400).json({
+                message: "User already exists"
+            });
+        }
+
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+
+        // Create user
+        const newUser = await User.create({
+            name,
+            email: email.toLowerCase().trim(),
+            password: hashedPassword
+        });
+
+
+        // Generate token
+        const token = genToken(newUser._id);
+
+
+        // Cookie options
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+
+        // Get user without password
+        const user = await User.findById(newUser._id)
+            .select("-password");
+
+
+        return res.status(201).json({
+            message: "User created successfully",
+            user
+        });
+
+    } catch (error) {
+
+        console.log("Register error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
     }
-
-
-    const existingUser = await User.findOne({
-      email: email.toLowerCase().trim()
-    });
-
-
-    if (existingUser) {
-      return res.status(400).json({
-        message: "User already exists"
-      });
-    }
-
-
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-
-
-    const newUser = await User.create({
-      name,
-      email: email.toLowerCase().trim(),
-      password: hashedPassword
-    });
-
-
-
-    const token = genToken(newUser._id);
-
-
-
-    res.cookie(
-      "token",
-      token,
-      cookieOptions
-    );
-
-
-
-    return res.status(201).json({
-      message: "User created successfully",
-      user: stripPassword(newUser)
-    });
-
-
-
-  } catch (error) {
-
-    console.log(error);
-
-    return res.status(500).json({
-      message: "Internal server error"
-    });
-  }
 };
 
 
 
-
-
-
-// ================= LOGIN =================
+// ================= LOGIN USER =================
 
 export const loginUser = async (req, res) => {
 
-  const { email, password } = req.body;
+    const { email, password } = req.body;
+
+    try {
+
+        // Check required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required"
+            });
+        }
 
 
-  try {
+        // Find user
+        const user = await User.findOne({
+            email: email.toLowerCase().trim()
+        });
 
 
-    if (!email || !password) {
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
 
-      return res.status(400).json({
-        message: "Email and password are required"
-      });
 
+        // Check password
+        const isPasswordCorrect = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
+
+
+        // Generate token
+        const token = genToken(user._id);
+
+
+        // Cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+
+        // Get user without password
+        const userData = await User.findById(user._id)
+            .select("-password");
+
+
+        return res.status(200).json({
+            message: "Login successful",
+            user: userData
+        });
+
+    } catch (error) {
+
+        console.log("Login error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
     }
-
-
-
-    const user = await User.findOne({
-      email: email.toLowerCase().trim()
-    });
-
-
-
-    if (!user) {
-
-      return res.status(401).json({
-        message: "Invalid email or password"
-      });
-
-    }
-
-
-
-
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password
-    );
-
-
-
-    if (!isPasswordValid) {
-
-      return res.status(401).json({
-        message: "Invalid email or password"
-      });
-
-    }
-
-
-
-
-    const token = genToken(user._id);
-
-
-
-    res.cookie(
-      "token",
-      token,
-      cookieOptions
-    );
-
-
-
-    return res.status(200).json({
-
-      message: "Login successful",
-
-      user: stripPassword(user)
-
-    });
-
-
-
-  } catch (error) {
-
-    console.log(error);
-
-
-    return res.status(500).json({
-
-      message: "Internal server error"
-
-    });
-
-  }
-
 };
-
-
-
-
 
 
 
 // ================= CURRENT USER =================
 
-
 export const currentUser = async (req, res) => {
 
+    try {
 
-  try {
+        // req.userId comes from authentication middleware
+        const user = await User.findById(req.userId)
+            .select("-password")
+            .populate({
+                path: "posts",
+                populate: {
+                    path: "authorId",
+                    select: "name email"
+                }
+            });
 
 
-    const user = await User.findById(req.userId)
-
-      .select("-password")
-
-      .populate({
-
-        path: "posts",
-
-        populate: {
-
-          path: "authorId",
-
-          select: "name email"
-
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
         }
 
-      });
 
+        return res.status(200).json({
+            user
+        });
 
+    } catch (error) {
 
-    if (!user) {
+        console.log("Current user error:", error);
 
-      return res.status(404).json({
-
-        message: "User not found"
-
-      });
-
+        return res.status(500).json({
+            message: "Internal server error"
+        });
     }
-
-
-
-
-    return res.status(200).json({
-
-      user
-
-    });
-
-
-
-  } catch (error) {
-
-
-    console.log(error);
-
-
-    return res.status(500).json({
-
-      message: "Internal server error"
-
-    });
-
-  }
-
 };
 
 
 
-
-
-
-
-
-// ================= LOGOUT =================
-
+// ================= LOGOUT USER =================
 
 export const logoutUser = (req, res) => {
 
+    try {
 
-  try {
-
-
-    res.clearCookie(
-
-      "token",
-
-      clearCookieOptions
-
-    );
+        // Clear token cookie
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none"
+        });
 
 
+        return res.status(200).json({
+            message: "Logout successful"
+        });
 
-    return res.status(200).json({
+    } catch (error) {
 
-      message: "Logout successful"
+        console.log("Logout error:", error);
 
-    });
-
-
-
-  } catch (error) {
-
-
-    console.log(error);
-
-
-
-    return res.status(500).json({
-
-      message: "Internal server error"
-
-    });
-
-  }
-
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
 };

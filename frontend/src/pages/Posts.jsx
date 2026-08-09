@@ -13,7 +13,7 @@ export default function Posts() {
         {/* Back Button */}
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-3 text-slate-400 hover:text-blue-400 transition mb-8"
+          className="flex items-center gap-3 text-slate-400 hover:text-blue-400 transition mb-8 cursor-pointer"
         >
           <ArrowLeft size={22} />
           Back to Home
